@@ -31,3 +31,18 @@ CTranslate2 | 2.51 | 153.93 | 61.35 | 7.65
 Llama.cpp | 11.37 | 58.73 | 5.16 | 3.71 
 vLLM | 1.76 | 142.76 | 81.32 | 70.38 
 vLLM + GPTQ | 2.45 | 200 | 81.65 | 71.36 
+
+
+### Larger Batch Sizes
+We also realize there are scenarios when batch inference is required. For those cases, we scale inference to batches of 4, 16, and 64 examples, respectively. Throughput and GPU memory results can be found in Figure 1 and Figure 1, respectively. We cannot run baseline Transformers inference method with batch size 64, because it exceeds the available 80GB of GPU memory, so we do not report results for that setting. We also observe that vLLM shows the best batch size scaling, especially when combined with GPTQ quantization, at a constant memory usage of 74GB. Exllama is the best-scaling low-level optimization, which also uses GPTQ quantization, with GPU memory requirements scaling linearly with batch size. LLama.cpp has a constant memory usage and throughput scaling, because it does not implement batch inference. 
+
+![ThroughputGraph](https://github.com/kogolobo/llm_inference_benchmark/assets/44957968/7a41760f-ea92-49ac-b3ed-e16e6ac6adb0)
+Figure 1: Throughput scaling results with increasing batch sizes
+
+![MemoryGraph](https://github.com/kogolobo/llm_inference_benchmark/assets/44957968/bdffd4ea-54eb-476a-b8bb-89b7dd4538ac)
+Figure 2: Memory requirement scaling with increasing batch size.
+
+## Conclusion
+we present a direct comparison between the existing optimized inference libraries for Transformer LLMs. We notice that Paged Attention and Quantization are crucial features enabling fast inference of large-scale models with reduced GPU memory requirements. Among those, we choose as vLLm and Exllama as the most promising ones. We also observe that, although efficient, the low-level implementations are currently provided by the community and may lack support for basic features, like batch inference and beam search decoding.
+
+Future works are needed to bring together the benefits of these techniques together: to create a robus, well-optimized CUDA inference library that untilizes both qunatization and paged attention.
