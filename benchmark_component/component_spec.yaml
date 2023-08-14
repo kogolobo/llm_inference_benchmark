@@ -4,7 +4,7 @@ display_name: "Benchmark LLaMA Inference"
 type: command
 description: Benchmark LLaMA inference on AzureML
 tags:
-  author: kogolobo@microsoft.com
+  author: kogolobo
 is_deterministic: true
 meta:
   requireGpu: true
