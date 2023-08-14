@@ -1,0 +1,108 @@
+name: benchmark_llama
+version: 0.0.1
+display_name: "Benchmark LLaMA Inference"
+type: command
+description: Benchmark LLaMA inference on AzureML
+tags:
+  author: kogolobo@microsoft.com
+is_deterministic: true
+meta:
+  requireGpu: true
+
+inputs:
+  dataset_name:
+    type: string
+    optional: false
+    description: The dataset name to use for benchmarking
+
+  dataset_split:
+    type: string
+    optional: true
+    default: "validation"
+    description: The dataset split to use for benchmarking
+
+  benchmark:
+    type: string
+    optional: false
+    description: The benchmark to use for benchmarking
+
+  batch_size:
+    type: integer
+    optional: true
+    default: 1
+    description: The batch size to use for benchmarking
+
+  max_eval_samples:
+    type: integer
+    optional: true
+    description: The maximum number of samples to use
+
+  max_new_tokens:
+    type: integer
+    optional: true
+    description: The maximum number of new tokens to generate
+
+  temperature:
+    type: number
+    optional: true
+    default: 0.0
+    description: The temperature to use for sampling
+
+  top_p:
+    type: number
+    optional: true
+    default: 1.0
+    description: The top_p to use for sampling  
+
+outputs:
+  output_path:
+    type: path
+    description: Directory to write outputs
+
+command:
+  pip install git+https://github.com/jllllll/exllama &&
+  pip install ctranslate2 &&
+  CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python &&
+  pip install vllm &&
+  bash hf_login.sh &&
+  python run_benchmark.py
+  --dataset_name ${{inputs.dataset_name}}
+  --benchmark ${{inputs.benchmark}}
+  $[[--batch_size ${{inputs.batch_size}}]]
+  $[[--max_eval_samples ${{inputs.max_eval_samples}}]]
+  $[[--max_new_tokens ${{inputs.max_new_tokens}}]]
+  $[[--temperature ${{inputs.temperature}}]]
+  $[[--top_p ${{inputs.top_p}}]]
+  --output_path ${{outputs.output_path}} 
+
+code: .
+
+# Image
+environment:
+  image: mcr.microsoft.com/azureml/openmpi4.1.0-cuda11.8-cudnn8-ubuntu22.04
+  conda_file:
+    name: project_environment
+    channels:
+    - defaults
+    dependencies:
+    - python=3.10.11
+    - git
+    - pip
+    - ninja
+    - packaging
+    - cmake
+    - pip: 
+        - transformers==4.31.0
+        - accelerate==0.21.0
+        - torch==2.0.1
+        - bitsandbytes==0.40.2
+        - azureml-core==1.51.0
+        - azureml-mlflow
+        - ray==2.6.1
+        - ray-on-aml
+        - numpy
+        - pandas
+        - scipy
+        - scikit-learn
+        
+  os_type: linux

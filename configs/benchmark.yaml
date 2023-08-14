@@ -1,0 +1,27 @@
+defaults:
+  - aml_config
+  - _self_
+
+hydra:
+  searchpath:
+    - file://.
+    - file://..
+    - file://../..
+    - file://../../..
+
+benchmark:
+  dataset_name: "roneneldan/TinyStories"
+  dataset_split: "validation"
+  max_eval_samples: 6000
+  batch_size: 1
+  
+  max_new_tokens: 200
+  temperature: 0.0
+  top_p: 1.0
+
+
+run:
+  tags: {}
+  priority: 1000
+  job_name: inference_benchmark
+  experiment_name: inference_benchmark

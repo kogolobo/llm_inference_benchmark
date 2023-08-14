@@ -1,0 +1,7 @@
+aml_config:
+  subscription_id: 
+  resource_group: 
+  workspace_name: 
+  cpu_target:  
+  gpu_target:
+  use_local_components: True 
