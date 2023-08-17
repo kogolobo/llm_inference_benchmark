@@ -14,7 +14,7 @@ Huggingface Transformers 4/8 bits | Bitsandbytes Quantization
 [Llama.cpp](https://github.com/abetlen/llama-cpp-python) | Custom Quantization, Low-level implementation
 [vLLM](https://github.com/vllm-project/vllm) | Paged Attention
 vLLM + GPTQ | GPTQ Quantization, Paged Attention
-MLC | Custom Quantization, Low-Level Implementation
+[MLC](https://mlc.ai/) | Custom Quantization, Low-Level Implementation
 
 ## Experiments
 we use [`meta-llama/Llama-2-7b-hf`](https://huggingface.co/meta-llama/Llama-2-7b-hf) to benchmark the optimized inference techniques. In each experiment, we use first 6000 samples from the validation set of [TinyStories](https://huggingface.co/datasets/roneneldan/TinyStories) dataset as context, requesting up to 200 tokens for each completion. We request completions in batches of 1, 4, 16, and 64, timing the latency. We report the average per-batch latency, as well as average throughput (tokens per second), discarding the times obtained for the first batch. We also report average GPU memory utilization. All experiments are run on a single AzureML Nvidia A100 80G GPU. 
