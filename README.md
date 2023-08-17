@@ -14,12 +14,13 @@ Huggingface Transformers 4/8 bits | Bitsandbytes Quantization
 [Llama.cpp](https://github.com/abetlen/llama-cpp-python) | Custom Quantization, Low-level implementation
 [vLLM](https://github.com/vllm-project/vllm) | Paged Attention
 vLLM + GPTQ | GPTQ Quantization, Paged Attention
+MLC | Custom Quantization, Low-Level Implementation
 
 ## Experiments
 we use [`meta-llama/Llama-2-7b-hf`](https://huggingface.co/meta-llama/Llama-2-7b-hf) to benchmark the optimized inference techniques. In each experiment, we use first 6000 samples from the validation set of [TinyStories](https://huggingface.co/datasets/roneneldan/TinyStories) dataset as context, requesting up to 200 tokens for each completion. We request completions in batches of 1, 4, 16, and 64, timing the latency. We report the average per-batch latency, as well as average throughput (tokens per second), discarding the times obtained for the first batch. We also report average GPU memory utilization. All experiments are run on a single AzureML Nvidia A100 80G GPU. 
 
 ### Batch Size 1
-Since interactive applications require turn-by-turn input from the user, a lot of LLM inference use cases will require inference with batch size of 1. We present the corresponding results in the table below. We observe that vLLM offers the best throughput, albeit using almost all available GPU space. In this case, the additional GPTQ quantization does not help the vLLM throughput. Exllama appears as the most promising low-level optimization library with considerably lower GPU memory needs. 
+Since interactive applications require turn-by-turn input from the user, a lot of LLM inference use cases will require inference with batch size of 1. We present the corresponding results in the table below. We observe that vLLM offers the best throughput, albeit using almost all available GPU space. In this case, the additional GPTQ quantization does not help the vLLM throughput. MLC appears as the most promising low-level optimization library with considerably lower GPU memory needs.
 
 Method | Latency (s) | Tokens | Throughput (token/s) | GPU Memory 
 ---|---|---|---|---
@@ -31,15 +32,15 @@ CTranslate2 | 2.51 | 153.93 | 61.35 | 7.65
 Llama.cpp | 11.37 | 58.73 | 5.16 | 3.71 
 vLLM | 1.76 | 142.76 | 81.32 | 70.38 
 vLLM + GPTQ | 2.45 | 200 | 81.65 | 71.36 
-
+MLC | 1.35 | 151.36 | 111.61 | 5.72
 
 ### Larger Batch Sizes
-We also realize there are scenarios when batch inference is required. For those cases, we scale inference to batches of 4, 16, and 64 examples, respectively. Throughput and GPU memory results can be found in Figure 1 and Figure 1, respectively. We cannot run baseline Transformers inference method with batch size 64, because it exceeds the available 80GB of GPU memory, so we do not report results for that setting. We also observe that vLLM shows the best batch size scaling, especially when combined with GPTQ quantization, at a constant memory usage of 74GB. Exllama is the best-scaling low-level optimization, which also uses GPTQ quantization, with GPU memory requirements scaling linearly with batch size. LLama.cpp has a constant memory usage and throughput scaling, because it does not implement batch inference. 
+We also realize there are scenarios when batch inference is required. For those cases, we scale inference to batches of 4, 16, and 64 examples, respectively. Throughput and GPU memory results can be found in Figure 1 and Figure 1, respectively. We cannot run baseline Transformers inference method with batch size 64, because it exceeds the available 80GB of GPU memory, so we do not report results for that setting. We also observe that vLLM shows the best batch size scaling, especially when combined with GPTQ quantization, at a constant memory usage of 74GB. Exllama is the best-scaling low-level optimization, which also uses GPTQ quantization, with GPU memory requirements scaling linearly with batch size. LLama.cpp and MLC have a constant memory usage and throughput scaling, because they does not implement batch inference.
 
-![ThroughputGraph](https://github.com/kogolobo/llm_inference_benchmark/assets/44957968/7a41760f-ea92-49ac-b3ed-e16e6ac6adb0)
+![ThroughputGraph](https://github.com/kogolobo/llm_inference_benchmark/assets/44957968/fef2170e-f1f8-475e-a48e-4ab282689555)
 Figure 1: Throughput scaling results with increasing batch sizes
 
-![MemoryGraph](https://github.com/kogolobo/llm_inference_benchmark/assets/44957968/bdffd4ea-54eb-476a-b8bb-89b7dd4538ac)
+![MemoryGraph](https://github.com/kogolobo/llm_inference_benchmark/assets/44957968/e0485a94-3053-494a-9855-490fb9d79274)
 Figure 2: Memory requirement scaling with increasing batch size.
 
 ## Conclusion
