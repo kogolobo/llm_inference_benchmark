@@ -44,6 +44,6 @@ Figure 1: Throughput scaling results with increasing batch sizes
 Figure 2: Memory requirement scaling with increasing batch size.
 
 ## Conclusion
-we present a direct comparison between the existing optimized inference libraries for Transformer LLMs. We notice that Paged Attention and Quantization are crucial features enabling fast inference of large-scale models with reduced GPU memory requirements. Among those, we choose as vLLm and Exllama as the most promising ones. We also observe that, although efficient, the low-level implementations are currently provided by the community and may lack support for basic features, like batch inference and beam search decoding.
+We present a direct comparison between the existing optimized inference libraries for Transformer LLMs. We notice that Paged Attention and Quantization are crucial features enabling fast inference of large-scale models with reduced GPU memory requirements. Among those, we choose as vLLM, MLC, and Exllama as the most promising ones. We also observe that, although efficient, the low-level implementations are currently provided by the community and may lack support for basic features, like batch inference and beam search decoding.
 
 Future works are needed to bring together the benefits of these techniques together: to create a robus, well-optimized CUDA inference library that untilizes both qunatization and paged attention.
